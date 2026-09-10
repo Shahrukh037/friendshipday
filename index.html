@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dil Se</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e0e14;
+      --card: #16161f;
+      --text: #eae6dc;
+      --muted: #9b9689;
+      --accent: #c9a87c;
+      --accent-soft: rgba(201, 168, 124, 0.15);
+      --border: rgba(201, 168, 124, 0.18);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    /* Soft ambient glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%;
+      left: -20%;
+      width: 70%;
+      height: 70%;
+      background: radial-gradient(circle, rgba(201, 168, 124, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -20%;
+      right: -15%;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(120, 100, 180, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ========== INTRO SCREEN ========== */
+    #intro {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    #intro.hide {
+      opacity: 0;
+      transform: translateY(-30px);
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+    }
+
+    .intro-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 8vw, 3.4rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 0.3s forwards;
+    }
+
+    .intro-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 0.6s forwards;
+    }
+
+    .open-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 14px 42px;
+      font-size: 0.95rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      opacity: 0;
+      animation: fadeUp 1.2s ease 0.9s forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .open-btn:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .open-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    #main {
+      display: none;
+      padding: 80px 0 120px;
+    }
+
+    #main.show {
+      display: block;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .section {
+      margin-bottom: 72px;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+      font-weight: 500;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      position: relative;
+    }
+
+    .card p {
+      font-size: 1.08rem;
+      font-weight: 300;
+      color: var(--text);
+    }
+
+    .card p + p {
+      margin-top: 18px;
+    }
+
+    .highlight {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--accent);
+      line-height: 1.5;
+    }
+
+    /* Typing effect */
+    .typing-container {
+      min-height: 120px;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: var(--accent);
+      margin-left: 3px;
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    /* Divider */
+    .soft-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.4;
+      margin: 40px auto;
+    }
+
+    /* Final section */
+    .final-message {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .final-message .big {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 5vw, 2.1rem);
+      font-weight: 400;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .final-note {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 420px;
+      margin: 0 auto 40px;
+    }
+
+    .signature {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--accent);
+      margin-top: 32px;
+    }
+
+    /* Progress dots */
+    .progress {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .progress.show {
+      opacity: 1;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.4);
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .card {
+        padding: 28px 22px;
+      }
+      .progress {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO -->
+  <section id="intro">
+    <div class="container">
+      <h1 class="intro-title">Dil Se</h1>
+      <p class="intro-sub">kuch baatein jo dil mein thi</p>
+      <button class="open-btn" id="openBtn">Open</button>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+    <div class="container">
+
+      <!-- Section 1 -->
+      <section class="section" data-index="0">
+        <div class="section-label">01</div>
+        <div class="card">
+          <p class="highlight">Main jaanta hoon…</p>
+          <p>Har baar main hi pehle sorry bol deta hoon. Kabhi-kabhi lagta hai ki yeh meri aadat ban gayi hai.</p>
+          <p>Is baar maine socha, sirf words nahi… thoda time aur effort bhi dena chahiye.</p>
+        </div>
+      </section>
+
+      <!-- Section 2 -->
+      <section class="section" data-index="1">
+        <div class="section-label">02</div>
+        <div class="card">
+          <p>Block hone ke baad jo silence thi, woh sunai deti thi.</p>
+          <p>Main yeh nahi keh raha ki main perfect tha. Galatiyaan hui, misunderstanding hui, aur main unhe theek se handle nahi kar paya.</p>
+        </div>
+      </section>
+
+      <!-- Section 3 -->
+      <section class="section" data-index="2">
+        <div class="section-label">03</div>
+        <div class="card">
+          <p class="highlight">Main maafi maangta hoon.</p>
+          <p>Us cheez ke liye jiski wajah se tumhe distance lena pada.</p>
+          <p>Us feeling ke liye jo tumhe hui, chahe main us waqt samajh na paya hoon.</p>
+        </div>
+      </section>
+
+      <!-- Section 4 -->
+      <section class="section" data-index="3">
+        <div class="section-label">04</div>
+        <div class="card">
+          <p>Main yeh nahi keh raha ki sab kuch turant theek ho jaye.</p>
+          <p>Main sirf yeh kehna chahta hoon ki main yahan hoon… jab tum ready ho.</p>
+          <p>Koi pressure nahi. Koi demand nahi.</p>
+        </div>
+      </section>
+
+      <!-- Final -->
+      <section class="section final-message" data-index="4">
+        <div class="soft-divider"></div>
+        <p class="big">Bas itna sa…</p>
+        <p class="final-note">
+          Agar kabhi mann kare baat karne ka, main sunne ke liye yahin hoon.<br>
+          Aur agar abhi space chahiye, woh bhi bilkul theek hai.
+        </p>
+        <p class="signature">— Prince</p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Progress dots -->
+  <div class="progress" id="progress">
+    <div class="dot" data-dot="0"></div>
+    <div class="dot" data-dot="1"></div>
+    <div class="dot" data-dot="2"></div>
+    <div class="dot" data-dot="3"></div>
+    <div class="dot" data-dot="4"></div>
+  </div>
+
+  <script>
+    const intro = document.getElementById('intro');
+    const main = document.getElementById('main');
+    const openBtn = document.getElementById('openBtn');
+    const progress = document.getElementById('progress');
+    const sections = document.querySelectorAll('.section');
+    const dots = document.querySelectorAll('.dot');
+
+    // Open the card
+    openBtn.addEventListener('click', () => {
+      intro.classList.add('hide');
+      setTimeout(() => {
+        intro.style.display = 'none';
+        main.classList.add('show');
+        progress.classList.add('show');
+        // Trigger first section
+        revealSections();
+      }, 700);
+    });
+
+    // Reveal sections on scroll
+    function revealSections() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            const index = entry.target.getAttribute('data-index');
+            updateDots(index);
+          }
+        });
+      }, {
+        threshold: 0.35,
+        rootMargin: '0px 0px -60px 0px'
+      });
+
+      sections.forEach(section => observer.observe(section));
+    }
+
+    function updateDots(activeIndex) {
+      dots.forEach(dot => {
+        dot.classList.toggle('active', dot.getAttribute('data-dot') === activeIndex);
+      });
+    }
+
+    // Smooth reveal for first section after open
+    setTimeout(() => {
+      if (main.classList.contains('show')) {
+        sections[0]?.classList.add('visible');
+        updateDots('0');
+      }
+    }, 900);
+  </script>
+</body>
+</html>
